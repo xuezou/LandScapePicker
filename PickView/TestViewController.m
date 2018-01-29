@@ -26,6 +26,8 @@
     [self.view addSubview:self.textLabel];
     
     self.pickerView = [[LandScapePicker alloc] initWithFrame:CGRectMake(100, 100, 200, 50)];
+    self.pickerView.backgroundColor = [UIColor lightGrayColor];
+    self.pickerView.titleColor = [UIColor whiteColor];
     [self.view addSubview:self.pickerView];
     
     self.pickerView.pTitles = @[@"李元芳",@"狄仁杰",@"安其拉",@"貂蝉"];

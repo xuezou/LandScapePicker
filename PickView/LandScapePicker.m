@@ -56,6 +56,7 @@
     
     UILabel *label = [[UILabel alloc] init];
     label.text = self.pTitles[row];
+    label.textColor = self.titleColor;
     label.textAlignment = NSTextAlignmentCenter;
     label.adjustsFontSizeToFitWidth = YES;
     label.transform = CGAffineTransformMakeRotation(M_PI_2);

@@ -17,5 +17,7 @@ typedef void(^LandScapePickerSelected)(NSInteger,NSString *);
 
 @property (nonatomic ,strong) NSArray<NSString *> *pTitles;
 
+@property (nonatomic ,strong) UIColor *titleColor;
+
 @property (nonatomic ,copy) LandScapePickerSelected lspSelected;
 @end
