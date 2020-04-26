@@ -8,10 +8,13 @@
 
 #import "LandScapePicker.h"
 
-@interface LandScapePicker()<UIPickerViewDelegate,UIPickerViewDataSource>
+@interface LandScapePicker()<UIPickerViewDelegate,UIPickerViewDataSource> {
+    BOOL _isTransform;
+}
 @property (nonatomic ,strong) UIPickerView *pickerView;
 
 @end
+
 
 @implementation LandScapePicker
 
@@ -20,15 +23,18 @@
     if (self) {
         self.backgroundColor = [UIColor clearColor];
         self.pickerView = [[UIPickerView alloc] init];
+        self.pickerView.backgroundColor = [UIColor clearColor];
         self.pickerView.delegate = self;
         self.pickerView.dataSource = self;
+        [self addSubview:self.pickerView];
     }
     return self;
 }
 
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
 - (void)drawRect:(CGRect)rect {
+    if (_isTransform) {
+        return;
+    }
     CGFloat w = rect.size.height;
     CGFloat h = rect.size.width;
     CGFloat centerX = w * 0.5;
@@ -37,25 +43,39 @@
     CGFloat x = centerY - w * 0.5;
     self.pickerView.frame = CGRectMake(x, y,w,h);
     self.pickerView.transform = CGAffineTransformMakeRotation(M_PI*3/2);
-    [self addSubview:self.pickerView];
+    _isTransform = YES;
 }
 
 - (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView {
     return 1;
 }
 
-- (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component {
+- (NSInteger)pickerView:(UIPickerView *)pickerView
+numberOfRowsInComponent:(NSInteger)component {
+    if (self.lspkTitles) {
+        return self.lspkTitles().count;
+    }
     return self.pTitles.count;
 }
 
-- (UIView *)pickerView:(UIPickerView *)pickerView viewForRow:(NSInteger)row forComponent:(NSInteger)component reusingView:(UIView *)view {
-    
+- (UIView *)pickerView:(UIPickerView *)pickerView
+            viewForRow:(NSInteger)row forComponent:(NSInteger)component
+           reusingView:(UIView *)view {
     for(UIView *singleLine in pickerView.subviews) {
         if (singleLine.frame.size.height < 1) {
             singleLine.backgroundColor = [UIColor clearColor];}}
     
     UILabel *label = [[UILabel alloc] init];
-    label.text = self.pTitles[row];
+    if (@available(iOS 8.2, *)) {
+        label.font = [UIFont systemFontOfSize:17 weight:UIFontWeightSemibold];
+    } else {
+        label.font = [UIFont systemFontOfSize:17];
+    }
+    if (self.lspkTitles) {
+        label.text = self.lspkTitles()[row];
+    }else {
+        label.text = self.pTitles[row];
+    }
     label.textColor = self.titleColor;
     label.textAlignment = NSTextAlignmentCenter;
     label.adjustsFontSizeToFitWidth = YES;
@@ -63,19 +83,36 @@
     return label;
 }
 
-- (CGFloat)pickerView:(UIPickerView *)pickerView widthForComponent:(NSInteger)component {
+- (CGFloat)pickerView:(UIPickerView *)pickerView
+    widthForComponent:(NSInteger)component {
     return 44;
 }
 
-- (CGFloat)pickerView:(UIPickerView *)pickerView rowHeightForComponent:(NSInteger)component {
+- (CGFloat)pickerView:(UIPickerView *)pickerView
+rowHeightForComponent:(NSInteger)component {
     return 88;
 }
 
-- (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
+- (void)pickerView:(UIPickerView *)pickerView
+      didSelectRow:(NSInteger)row
+       inComponent:(NSInteger)component {
     if (self.lspSelected) {
-        self.lspSelected(row,self.pTitles[row]);
+        NSString *title;
+        if (self.lspkTitles) {
+            title = self.lspkTitles()[row];
+        }else {
+            title = self.pTitles[row];
+        }
+        self.lspSelected(row,title);
     }
 }
 
+- (void)selectRow:(NSInteger)row {
+    [self.pickerView selectRow:row inComponent:0 animated:YES];
+}
+
+- (void)reload {
+    [self.pickerView reloadAllComponents];
+}
 
 @end
